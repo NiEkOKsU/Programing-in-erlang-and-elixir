@@ -1,0 +1,5 @@
+-module(points).
+
+%% API
+-export([]).
+
