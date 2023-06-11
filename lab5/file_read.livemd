@@ -1,0 +1,52 @@
+# Untitled notebook
+
+## Section
+
+```elixir
+dataTab =
+  File.read!("C:/Users/proks/OneDrive/Pulpit/Programing-in-erlang-and-elixir/lab5/pollution.csv")
+  |> String.split("\r\n")
+```
+
+```elixir
+defmodule ModuleParse do
+  def parseData(head) do
+    datas = String.split(head, ",")
+    [day, hour, x, y, value] = datas
+    [day, month, year] = String.split(day, "-")
+    day = {parseInt(year), parseInt(month), parseInt(day)}
+    [hour, minute] = String.split(hour, ":")
+    hour = {parseInt(hour), parseInt(minute)}
+    {x, _} = Float.parse(x)
+    {y, _} = Float.parse(y)
+    value = parseInt(value)
+    map = %{:datetime => {day, hour}, :location => {x, y}, :value => value}
+    map
+  end
+
+  def parseInt(l) do
+    {l, _} = Integer.parse(l)
+    l
+  end
+
+  def loadToTab([]) do
+  end
+
+  def loadToTab([head | tail]) do
+    newTab = [parseData(head)]
+    newTab ++ loadToTab(tail)
+  end
+end
+
+dataTab = ModuleParse.loadToTab(dataTab)
+```
+
+```elixir
+defmodule UniqueStation do
+  def identifyStations(tab) do
+    Enum.uniq_by(tab, fn {_, x, _} -> x end)
+  end
+end
+
+UniqueStation.identifyStations(dataTab)
+```

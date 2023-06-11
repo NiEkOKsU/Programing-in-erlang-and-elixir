@@ -16,20 +16,23 @@
 start_link() ->
     supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
-%% sup_flags() = #{strategy => strategy(),         % optional
-%%                 intensity => non_neg_integer(), % optional
-%%                 period => pos_integer()}        % optional
-%% child_spec() = #{id => child_id(),       % mandatory
-%%                  start => mfargs(),      % mandatory
-%%                  restart => restart(),   % optional
-%%                  shutdown => shutdown(), % optional
-%%                  type => worker(),       % optional
-%%                  modules => modules()}   % optional
+
 init([]) ->
     SupFlags = #{strategy => one_for_all,
-                 intensity => 0,
-                 period => 1},
-    ChildSpecs = [],
+                 intensity => 2,
+                 period => 2000},
+    ChildSpecs = [{pollution_gen_server,
+      {pollution_gen_server, start_link, []},
+      permanent,
+      brutal_kill,
+      worker,
+      [pollution_gen_server]},
+      {pollution_value_collector_gen_statem,
+        {pollution_value_collector_gen_statem, start_link, []},
+        permanent,
+        brutal_kill,
+        worker,
+        [pollution_value_collector_gen_statem]}],
     {ok, {SupFlags, ChildSpecs}}.
 
 %% internal functions
